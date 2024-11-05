@@ -74,6 +74,18 @@ qm9_second_half = {
     # 'bond2_radius': {'H': -1000, 'C': 67, 'N': 60, 'O': 57, 'F': 59},
     # 'bond3_radius': {'H': -1000, 'C': 60, 'N': 54, 'O': 53, 'F': 53}}
 
+XANES = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Ti': 1},
+    'atomic_nb': [6, 22],
+    'atom_decoder': ['O', 'Ti'],
+    'max_n_nodes': 7,
+    'n_nodes': {7: 342},
+    'atom_types':{0: 342, 1: 2052},
+    'colors_dic': ['C3', 'C9'],
+    'radius_dic': [0.6, 0.6],
+    'with_h': True
+}
 
 geom_with_h = {
     'name': 'geom',
