@@ -130,7 +130,7 @@ parser.add_argument('--sequential', action='store_true',
                     help='Organize data by size to reduce average memory usage.')
 args = parser.parse_args()
 
-data_file = './data/geom/geom_drugs_30.npy'
+data_file = './data/geom/Ti_6.npy' # './data/geom/geom_drugs_30.npy'
 
 if args.remove_h:
     raise NotImplementedError()
@@ -262,8 +262,10 @@ def main():
                 wandb.log(model.log_info(), commit=True)
 
             if not args.break_train_epoch:
-                train_test.analyze_and_save(epoch, model_ema, nodes_dist, args, device,
-                                            dataset_info, prop_dist, n_samples=args.n_stability_samples)
+                print("Skipping Analyze and Save for now")
+                # train_test.analyze_and_save(epoch, model_ema, nodes_dist, args, device,
+                #                             dataset_info, prop_dist, n_samples=args.n_stability_samples)
+                
             nll_val = train_test.test(args, dataloaders['val'], epoch, model_ema_dp, device, dtype,
                                       property_norms, nodes_dist, partition='Val')
             nll_test = train_test.test(args, dataloaders['test'], epoch, model_ema_dp, device, dtype,
