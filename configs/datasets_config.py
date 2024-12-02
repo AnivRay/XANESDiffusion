@@ -74,19 +74,47 @@ qm9_second_half = {
     # 'bond2_radius': {'H': -1000, 'C': 67, 'N': 60, 'O': 57, 'F': 59},
     # 'bond3_radius': {'H': -1000, 'C': 60, 'N': 54, 'O': 53, 'F': 53}}
 
+# "V":23, "Cr":24, "Mn":25, "Fe":26, "Co":27, "Ni":28, "Cu":29}
 geom_with_h = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Ti': 1, 'V': 2, 'Cr': 3, 'Mn': 4, 'Fe': 5, 'Co': 6, 'Ni': 7, 'Cu': 8},
+    'atomic_nb': [6, 22, 23, 24, 25, 26, 27, 28, 29],
+    'atom_decoder': ['O', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu'],
+    'max_n_nodes': 7,
+    'n_nodes': {5: 646, 6: 354, 7: 1636},
+    'atom_types':{0: 14170, 1: 440, 2: 288, 3: 253, 4: 325, 5: 296, 6: 193, 7: 268, 8: 573},
+    'colors_dic': ['C3', 'C9', 'C2', 'C7', 'C0', 'C1', 'C5', 'C6', 'C4'],
+    'radius_dic': [0.3, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+    'with_h': True
+}
+
+old_XANES = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1},
     'atomic_nb': [6, 22],
     'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 7,
     'n_nodes': {7: 342},
-    'atom_types':{0: 342, 1: 2052},
+    'atom_types':{0: 2052, 1: 342},
     'colors_dic': ['C3', 'C9'],
     'radius_dic': [0.6, 0.6],
     'with_h': True
 }
 
+# The original geom_with_h
+# Keys:
+# name: name of the dataset. It's used in the code to id the dataset
+# atomic_encoder: Maps each element in the dataset to an index. Should start from 0 and increment by 1
+# atomic_nb: Each index in this list contains the atomic number of the element corresponding to the decoding of the index
+# atom_decoder: A list where each index contains the element name that it corresponds to
+# max_n_nodes: The maximum number of atoms in any molecule in the dataset
+# n_nodes: A dictionary with entries for every molecule size where the key is the number of atoms in the molecule and the 
+#          value is the number of such molecules in the dataset
+# atom_types: A dictionary where there is an entry for every unique element in the dataset. The keys are encoded element index
+#             and the values are the number of that element in the whole dataset (in all molecules)
+# colors_dic: A list where the index is the atomic encoding of an element and the value is a color code (for visualization)
+# radius_dic: A list where the index is the atomic encoding of an element and the value is a radius size (for visualization)
+# with_h: A boolean that stores whether or not the dataset has hydrogen (I kept is True because it is in geom)
 # geom_with_h = {
 #     'name': 'geom',
 #     'atom_encoder': {'H': 0, 'B': 1, 'C': 2, 'N': 3, 'O': 4, 'F': 5, 'Al': 6, 'Si': 7,
