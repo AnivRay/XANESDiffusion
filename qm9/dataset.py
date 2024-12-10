@@ -38,7 +38,7 @@ def retrieve_dataloaders(cfg):
     elif 'geom' in cfg.dataset:
         import build_geom_dataset
         from configs.datasets_config import get_dataset_info
-        data_file = './data/geom/geom_drugs_30.npy'
+        data_file = './data/geom/All_XANES.npy' # Fix this later: changing to xanes file for now
         dataset_info = get_dataset_info(cfg.dataset, cfg.remove_h)
 
         # Retrieve QM9 dataloaders

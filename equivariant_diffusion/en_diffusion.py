@@ -5,7 +5,7 @@ import torch
 from egnn import models
 from torch.nn import functional as F
 from equivariant_diffusion import utils as diffusion_utils
-
+import time
 
 # Defining some useful util functions.
 def expm1(x: torch.Tensor) -> torch.Tensor:
@@ -112,6 +112,7 @@ def gaussian_KL_for_dimension(q_mu, q_sigma, p_mu, p_sigma, d):
             The KL distance, summed over all dimensions except the batch dim.
         """
     mu_norm2 = sum_except_batch((q_mu - p_mu)**2)
+    # print(len(q_sigma.size()))
     assert len(q_sigma.size()) == 1
     assert len(p_sigma.size()) == 1
     return (d * torch.log(p_sigma / (q_sigma + 1e-8) + 1e-8) 
@@ -405,6 +406,7 @@ class EnVariationalDiffusion(torch.nn.Module):
         return sigma2_t_given_s, sigma_t_given_s, alpha_t_given_s
 
     def kl_prior(self, xh, node_mask):
+        # print(xh.size())
         """Computes the KL between q(z1 | x) and the prior p(z1) = Normal(0, 1).
 
         This is essentially a lot of work for something that is in practice negligible in the loss. However, you
@@ -422,6 +424,7 @@ class EnVariationalDiffusion(torch.nn.Module):
         # Compute standard deviations (only batch axis for x-part, inflated for h-part).
         sigma_T_x = self.sigma(gamma_T, mu_T_x).squeeze()  # Remove inflate, only keep batch dimension for x-part.
         sigma_T_h = self.sigma(gamma_T, mu_T_h)
+        # print(sigma_T_x.size(), " ", sigma_T_h.size())
 
         # Compute KL for h-part.
         zeros, ones = torch.zeros_like(mu_T_h), torch.ones_like(sigma_T_h)
@@ -1161,6 +1164,16 @@ class EnLatentDiffusion(EnVariationalDiffusion):
             # Decoder output (reconstruction).
             x_recon, h_recon = self.vae.decoder._forward(z_xh, node_mask, edge_mask, context)
             xh_rec = torch.cat([x_recon, h_recon], dim=2)
+            # print(xh[0, 0], "\n\n", xh_rec[0, 0])
+            timestamp = time.time()
+            filename_xh = "xh_{}".format(timestamp)
+            filename_xh_rec = "xh_rec_{}".format(timestamp)
+            with open("outputs/reconstructions/{}".format(filename_xh), 'wb') as xh_file:
+                np.save(xh_file, xh.cpu().numpy())
+            with open("outputs/reconstructions/{}".format(filename_xh_rec), 'wb') as xh_rec_file:
+                np.save(xh_rec_file, xh_rec.cpu().numpy())
+            # print(xh.size(), "\n", xh_rec.size(), "\n")
+            # exit(0)
             loss_recon = self.vae.compute_reconstruction_error(xh_rec, xh)
         else:
             loss_recon = 0
