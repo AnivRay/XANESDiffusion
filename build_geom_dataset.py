@@ -93,8 +93,8 @@ def load_split_data(conformation_file, val_proportion=0.1, test_proportion=0.1,
     # print('Warning, currently taking a random permutation for '
     #       'train/val/test partitions, this needs to be fixed for'
     #       'reproducibility.')
-    # assert not os.path.exists(os.path.join(base_path, 'XANES_permutation.npy'))
-    # np.save(os.path.join(base_path, 'XANES_permutation.npy'), perm)
+    # assert not os.path.exists(os.path.join(base_path, 'w_XANES_permutation.npy'))
+    # np.save(os.path.join(base_path, 'w_XANES_permutation.npy'), perm)
     # del perm
 
     perm = np.load(os.path.join(base_path, 'XANES_permutation.npy'))
@@ -214,10 +214,12 @@ class GeomDrugsTransform(object):
         self.sequential = sequential
 
     def __call__(self, data):
-        # print(data)
+        # print("My data shape:\n", data)
+        # exit(0)
         n = data.shape[0]
         new_data = {}
-        new_data['positions'] = torch.from_numpy(data[:, -3:])
+        new_data['xanes'] = torch.from_numpy(data[:, 4:])
+        new_data['positions'] = torch.from_numpy(data[:, 1:4])
         atom_types = torch.from_numpy(data[:, 0].astype(int)[:, None])
         # print("Atom types:\n", atom_types)
         # print("Atomic number list:\n", self.atomic_number_list)

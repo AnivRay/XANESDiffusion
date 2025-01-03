@@ -130,7 +130,7 @@ parser.add_argument('--sequential', action='store_true',
                     help='Organize data by size to reduce average memory usage.')
 args = parser.parse_args()
 
-data_file = './data/geom/All_XANES.npy' # './data/geom/geom_drugs_30.npy'
+data_file = './data/geom/All_w_XANES.npy' # './data/geom/geom_drugs_30.npy'
 
 if args.remove_h:
     raise NotImplementedError()
@@ -193,7 +193,7 @@ data_dummy = next(iter(dataloaders['train']))
 
 if len(args.conditioning) > 0:
     print(f'Conditioning on {args.conditioning}')
-    property_norms = compute_mean_mad(dataloaders, args.conditioning)
+    property_norms = compute_mean_mad(dataloaders, args.conditioning, "xanes") # Update this
     context_dummy = prepare_context(args.conditioning, data_dummy, property_norms)
     context_node_nf = context_dummy.size(2)
 else:
@@ -201,7 +201,6 @@ else:
     property_norms = None
 
 args.context_node_nf = context_node_nf
-
 
 # Create Latent Diffusion Model or Audoencoder
 if args.train_diffusion:

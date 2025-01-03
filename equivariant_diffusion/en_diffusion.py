@@ -1164,14 +1164,15 @@ class EnLatentDiffusion(EnVariationalDiffusion):
             # Decoder output (reconstruction).
             x_recon, h_recon = self.vae.decoder._forward(z_xh, node_mask, edge_mask, context)
             xh_rec = torch.cat([x_recon, h_recon], dim=2)
+            # NOTE: This is the part to save the reconstructions if desired
             # print(xh[0, 0], "\n\n", xh_rec[0, 0])
-            timestamp = time.time()
-            filename_xh = "xh_{}".format(timestamp)
-            filename_xh_rec = "xh_rec_{}".format(timestamp)
-            with open("outputs/reconstructions/{}".format(filename_xh), 'wb') as xh_file:
-                np.save(xh_file, xh.cpu().numpy())
-            with open("outputs/reconstructions/{}".format(filename_xh_rec), 'wb') as xh_rec_file:
-                np.save(xh_rec_file, xh_rec.cpu().numpy())
+            # timestamp = time.time()
+            # filename_xh = "xh_{}".format(timestamp)
+            # filename_xh_rec = "xh_rec_{}".format(timestamp)
+            # with open("outputs/reconstructions/{}".format(filename_xh), 'wb') as xh_file:
+            #     np.save(xh_file, xh.cpu().numpy())
+            # with open("outputs/reconstructions/{}".format(filename_xh_rec), 'wb') as xh_rec_file:
+            #     np.save(xh_rec_file, xh_rec.cpu().numpy())
             # print(xh.size(), "\n", xh_rec.size(), "\n")
             # exit(0)
             loss_recon = self.vae.compute_reconstruction_error(xh_rec, xh)

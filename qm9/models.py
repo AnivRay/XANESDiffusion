@@ -248,7 +248,7 @@ class DistributionProperty:
         for val in values:
             i = int((val - prop_min)/prop_range * n_bins)
             # Because of numerical precision, one sample can fall in bin int(n_bins) instead of int(n_bins-1)
-            # We move it to bin int(n_bind-1 if tat happens)
+            # We move it to bin int(n_bind-1 if that happens)
             if i == n_bins:
                 i = n_bins - 1
             histogram[i] += 1

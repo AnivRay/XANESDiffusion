@@ -4,11 +4,33 @@ import torch
 def compute_mean_mad(dataloaders, properties, dataset_name):
     if dataset_name == 'qm9':
         return compute_mean_mad_from_dataloader(dataloaders['train'], properties)
-    elif dataset_name == 'qm9_second_half' or dataset_name == 'qm9_second_half':
+    elif dataset_name == 'qm9_second_half':
         return compute_mean_mad_from_dataloader(dataloaders['valid'], properties)
+    elif dataset_name == 'xanes':
+        return compute_mean_mad_from_xanes_dataloader(dataloaders['train'], properties)
     else:
         raise Exception('Wrong dataset name')
 
+def compute_mean_mad_from_xanes_dataloader(dataloader, properties):
+    property_values = {}
+    for property_key in properties:
+        property_values[property_key] = []
+    for data in dataloader:
+        for property_key in properties:
+            property_values[property_key].append(torch.reshape(data[property_key], (-1, data[property_key].size(-1))))
+    for property_key in properties:
+        property_values[property_key] = torch.cat(property_values[property_key])
+
+    property_norms = {}
+    for property_key in properties:
+        values = property_values[property_key]
+        mean = torch.mean(values, dim=0)
+        ma = torch.abs(values - mean)
+        mad = torch.mean(ma, dim=0)
+        property_norms[property_key] = {}
+        property_norms[property_key]['mean'] = mean
+        property_norms[property_key]['mad'] = mad
+    return property_norms
 
 def compute_mean_mad_from_dataloader(dataloader, properties):
     property_norms = {}
@@ -55,7 +77,7 @@ def preprocess_input(one_hot, charges, charge_power, charge_scale, device):
 
 def prepare_context(conditioning, minibatch, property_norms):
     batch_size, n_nodes, _ = minibatch['positions'].size()
-    node_mask = minibatch['atom_mask'].unsqueeze(2)
+    node_mask = minibatch['atom_mask'].unsqueeze(2).cpu()
     context_node_nf = 0
     context_list = []
     for key in conditioning:
