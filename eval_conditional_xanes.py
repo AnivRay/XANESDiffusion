@@ -14,14 +14,17 @@ import qm9.visualizer as vis
 
 def get_context_from_dataloader(dataloader, properties):
     property_values = {}
+    nodesxsample = []
     for property_key in properties:
         property_values[property_key] = []
     for data in dataloader:
         for property_key in properties:
-            property_values[property_key].append(torch.reshape(data[property_key], (-1, data[property_key].size(-1))))
+            property_values[property_key].append(data[property_key][:, 0, :])
+            nodesxsample.append(torch.sum(data['atom_mask'], dim=1))
     for property_key in properties:
         property_values[property_key] = torch.cat(property_values[property_key])
-    return property_values
+    nodesxsample = torch.cat(nodesxsample).int()
+    return property_values, nodesxsample
 
 def get_classifier(dir_path='', device='cpu'):
     with open(join(dir_path, 'args.pickle'), 'rb') as f:
@@ -184,15 +187,15 @@ def main_quantitative(args):
     #    print("Loss numnodes classifier on EDM generated samples: %.4f" % loss)
 
 
-def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, property_values, epoch=0, id_from=0):
-    one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, property_values)
+def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, property_values, property_norms, nodesxsample, epoch=0, id_from=0):
+    one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, property_values, property_norms, nodesxsample)
 
     vis.save_xyz_file(
         'outputs/%s/analysis/run%s/' % (args.exp_name, epoch), one_hot, charges, x, dataset_info,
         id_from, name='conditional', node_mask=node_mask)
 
-    vis.visualize_chain("outputs/%s/analysis/run%s/" % (args.exp_name, epoch), dataset_info,
-                        wandb=None, mode='conditional', spheres_3d=True)
+    # vis.visualize_chain("outputs/%s/analysis/run%s/" % (args.exp_name, epoch), dataset_info,
+    #                     wandb=None, mode='conditional', spheres_3d=True)
 
     return one_hot, charges, x
 
@@ -202,14 +205,14 @@ def main_qualitative(args):
     args_gen.device = args.device
     dataloaders = get_dataloader(args_gen)
     property_norms = compute_mean_mad(dataloaders, args_gen.conditioning, "xanes_test") # args_gen.dataset) NOTE: This is due to xanes dataset using geom dataset name. Fix later.
-    property_values = get_context_from_dataloader(dataloaders["test"], args_gen.conditioning)
+    property_values, nodesxsample = get_context_from_dataloader(dataloaders["test"], args_gen.conditioning)
     model, nodes_dist, prop_dist, dataset_info = get_generator(args.generators_path,
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
 
     for i in range(args.n_sweeps):
         print("Sampling sweep %d/%d" % (i+1, args.n_sweeps))
-        save_and_sample_conditional(args_gen, device, model, prop_dist, dataset_info, property_values, epoch=i, id_from=0)
+        save_and_sample_conditional(args_gen, device, model, prop_dist, dataset_info, property_values, property_norms, nodesxsample, epoch=i, id_from=0)
 
 
 

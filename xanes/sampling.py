@@ -154,21 +154,20 @@ def sample(args, device, generative_model, dataset_info,
     return one_hot, charges, x, node_mask
 
 
-def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_dist, property_values, n_nodes=7, n_frames=100):
-    nodesxsample = torch.tensor([n_nodes] * n_frames)
-    print(nodesxsample)
-    exit(0)
+def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_dist, property_values, property_norms, nodesxsample, n_nodes=7, n_frames=100):
+    # We no longer hardcode nodesxsample and instead provide it based on the ground truth # of nodes/atoms by molecule in the test set
+    # nodesxsample = torch.tensor([n_nodes] * len(property_values['xanes']))
 
     context = []
-    for key in prop_dist.distributions:
+    for key in property_values:
         values = property_values[key]
         # min_val, max_val = prop_dist.distributions[key][n_nodes]['params']
-        mean, mad = prop_dist.normalizer[key]['mean'], prop_dist.normalizer[key]['mad']
+        mean, mad = property_norms[key]['mean'], property_norms[key]['mad']
         values = (values - mean) / mad
         # min_val = (min_val - mean) / (mad)
         # max_val = (max_val - mean) / (mad)
         # context_row = torch.tensor(np.linspace(min_val, max_val, n_frames)).unsqueeze(1)
-        context.append(context_row)
+        context.append(values)
     context = torch.cat(context, dim=1).float().to(device)
 
     one_hot, charges, x, node_mask = sample(args, device, generative_model, dataset_info, prop_dist, nodesxsample=nodesxsample, context=context, fix_noise=True)
