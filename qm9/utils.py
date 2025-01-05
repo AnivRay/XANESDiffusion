@@ -8,9 +8,12 @@ def compute_mean_mad(dataloaders, properties, dataset_name):
         return compute_mean_mad_from_dataloader(dataloaders['valid'], properties)
     elif dataset_name == 'xanes':
         return compute_mean_mad_from_xanes_dataloader(dataloaders['train'], properties)
+    elif dataset_name == 'xanes_test':
+        return compute_mean_mad_from_xanes_dataloader(dataloaders['test'], properties)
     else:
         raise Exception('Wrong dataset name')
 
+# Have to do this because Drugs/Xanes dataset does not store properties in one object. They are extracted in the dataset transform.
 def compute_mean_mad_from_xanes_dataloader(dataloader, properties):
     property_values = {}
     for property_key in properties:
