@@ -130,7 +130,7 @@ parser.add_argument('--sequential', action='store_true',
                     help='Organize data by size to reduce average memory usage.')
 args = parser.parse_args()
 
-data_file = './data/geom/All_w_XANES.npy' # './data/geom/geom_drugs_30.npy'
+data_file = './data/geom/Cu_w_XANES.npy' # './data/geom/geom_drugs_30.npy'
 
 if args.remove_h:
     raise NotImplementedError()
@@ -209,6 +209,10 @@ else:
     model, nodes_dist, prop_dist = get_autoencoder(args, device, dataset_info, dataloaders['train'])
 
 model = model.to(device)
+numParams = sum(p.numel() for p in model.parameters())
+numTrainableParams = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print("Model has\n", numParams, "Parameters\n", numTrainableParams, "Trainable Parameters")
+# print(model)
 optim = get_optim(args, model)
 # print(model)
 
@@ -285,13 +289,13 @@ def main():
                     with open('outputs/%s/args.pickle' % args.exp_name, 'wb') as f:
                         pickle.dump(args, f)
 
-            if args.save_model:
-                utils.save_model(optim, 'outputs/%s/optim_%d.npy' % (args.exp_name, epoch))
-                utils.save_model(model, 'outputs/%s/generative_model_%d.npy' % (args.exp_name, epoch))
-                if args.ema_decay > 0:
-                    utils.save_model(model_ema, 'outputs/%s/generative_model_ema_%d.npy' % (args.exp_name, epoch))
-                with open('outputs/%s/args_%d.pickle' % (args.exp_name, epoch), 'wb') as f:
-                    pickle.dump(args, f)
+            # if args.save_model:
+            #     utils.save_model(optim, 'outputs/%s/optim_%d.npy' % (args.exp_name, epoch))
+            #     utils.save_model(model, 'outputs/%s/generative_model_%d.npy' % (args.exp_name, epoch))
+            #     if args.ema_decay > 0:
+            #         utils.save_model(model_ema, 'outputs/%s/generative_model_ema_%d.npy' % (args.exp_name, epoch))
+            #     with open('outputs/%s/args_%d.pickle' % (args.exp_name, epoch), 'wb') as f:
+            #         pickle.dump(args, f)
             print('Val loss: %.4f \t Test loss:  %.4f' % (nll_val, nll_test))
             print('Best val loss: %.4f \t Best test loss:  %.4f' % (best_nll_val, best_nll_test))
             wandb.log({"Val loss ": nll_val}, commit=True)

@@ -1030,8 +1030,12 @@ class EnHierarchicalVAE(torch.nn.Module):
         diffusion_utils.assert_correctly_masked(x, node_mask)
 
         h_int = xh[:, :, -1:] if self.include_charges else torch.zeros(0).to(xh)
-        h_cat = xh[:, :, self.n_dims:-1]  # TODO: have issue when include_charges is False
+        # print("h_cat pre-issue:\n", xh[:, :, self.n_dims:][0])
+        h_cat = xh[:, :, self.n_dims:-1] if self.include_charges else xh[:, :, self.n_dims:] # TODO: have issue when include_charges is False
+        # print("h_cat pre-one-hot:\n", h_cat[0])
+        # print("h_cat post-argmax:\n", torch.argmax(h_cat, dim=2)[0])
         h_cat = F.one_hot(torch.argmax(h_cat, dim=2), self.num_classes) * node_mask
+        # print("h_cat post-one-hot:\n", h_cat[0])
         h_int = torch.round(h_int).long() * node_mask
         h = {'integer': h_int, 'categorical': h_cat}
 

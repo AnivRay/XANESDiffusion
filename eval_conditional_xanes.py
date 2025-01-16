@@ -1,6 +1,7 @@
 import argparse
 from os.path import join
 import torch
+import numpy as np
 import pickle
 from qm9.models import get_model, get_autoencoder, get_latent_diffusion
 from configs.datasets_config import get_dataset_info
@@ -12,19 +13,26 @@ from qm9.property_prediction import main_qm9_prop
 from xanes.sampling import sample_chain, sample, sample_sweep_conditional
 import qm9.visualizer as vis
 
-def get_context_from_dataloader(dataloader, properties):
-    property_values = {}
+def get_and_save_values_from_dataloader(args, dataloader, properties, dataset_info):
+    values = {}
     nodesxsample = []
     for property_key in properties:
-        property_values[property_key] = []
+        values[property_key] = []
+    id_from = 0
     for data in dataloader:
         for property_key in properties:
-            property_values[property_key].append(data[property_key][:, 0, :])
-            nodesxsample.append(torch.sum(data['atom_mask'], dim=1))
-    for property_key in properties:
-        property_values[property_key] = torch.cat(property_values[property_key])
+            values[property_key].append(data[property_key][:, 0, :])
+        nodesxsample.append(torch.sum(data['atom_mask'], dim=1))
+        # Save batch of ground truth data starting from where previous batch left off
+        vis.save_xyz_file('outputs/%s/analysis/groundtruth/' % (args.exp_name), data['one_hot'].float(), data['charges'], data['positions'], dataset_info, id_from, name='gt', node_mask=data['atom_mask'])
+        id_from += len(data['positions'])
+    for key in values:
+        values[key] = torch.cat(values[key])
     nodesxsample = torch.cat(nodesxsample).int()
-    return property_values, nodesxsample
+
+    # Save xanes specta
+    np.save('outputs/{}/analysis/xanes_conditioning.npy'.format(args.exp_name), values['xanes'].numpy())
+    return values, nodesxsample
 
 def get_classifier(dir_path='', device='cpu'):
     with open(join(dir_path, 'args.pickle'), 'rb') as f:
@@ -187,8 +195,8 @@ def main_quantitative(args):
     #    print("Loss numnodes classifier on EDM generated samples: %.4f" % loss)
 
 
-def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, property_values, property_norms, nodesxsample, epoch=0, id_from=0):
-    one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, property_values, property_norms, nodesxsample)
+def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, values, property_norms, nodesxsample, epoch=0, id_from=0):
+    one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, values, property_norms, nodesxsample)
 
     vis.save_xyz_file(
         'outputs/%s/analysis/run%s/' % (args.exp_name, epoch), one_hot, charges, x, dataset_info,
@@ -204,15 +212,18 @@ def main_qualitative(args):
     args_gen = get_args_gen(args.generators_path)
     args_gen.device = args.device
     dataloaders = get_dataloader(args_gen)
+    # This is to account for loading in models that were not trained with xanes conditioning
+    if "xanes" not in args_gen.conditioning:
+        args_gen.conditioning.append("xanes")
     property_norms = compute_mean_mad(dataloaders, args_gen.conditioning, "xanes_test") # args_gen.dataset) NOTE: This is due to xanes dataset using geom dataset name. Fix later.
-    property_values, nodesxsample = get_context_from_dataloader(dataloaders["test"], args_gen.conditioning)
     model, nodes_dist, prop_dist, dataset_info = get_generator(args.generators_path,
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
-
+    values, nodesxsample = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
+    
     for i in range(args.n_sweeps):
         print("Sampling sweep %d/%d" % (i+1, args.n_sweeps))
-        save_and_sample_conditional(args_gen, device, model, prop_dist, dataset_info, property_values, property_norms, nodesxsample, epoch=i, id_from=0)
+        save_and_sample_conditional(args_gen, device, model, prop_dist, dataset_info, values, property_norms, nodesxsample, epoch=i, id_from=0)
 
 
 

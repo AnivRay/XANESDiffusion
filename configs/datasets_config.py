@@ -77,6 +77,19 @@ qm9_second_half = {
 # "V":23, "Cr":24, "Mn":25, "Fe":26, "Co":27, "Ni":28, "Cu":29}
 geom_with_h = {
     'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Cu': 1},
+    'atomic_nb': [6, 29],
+    'atom_decoder': ['O', 'Cu'],
+    'max_n_nodes': 7,
+    'n_nodes': {5: 314, 6: 106, 7: 153},
+    'atom_types':{0: 2704, 1: 573},
+    'colors_dic': ['C3', 'C4'],
+    'radius_dic': [0.3, 0.6],
+    'with_h': True
+}
+
+all_w_XANES = {
+    'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1, 'V': 2, 'Cr': 3, 'Mn': 4, 'Fe': 5, 'Co': 6, 'Ni': 7, 'Cu': 8},
     'atomic_nb': [6, 22, 23, 24, 25, 26, 27, 28, 29],
     'atom_decoder': ['O', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu'],
