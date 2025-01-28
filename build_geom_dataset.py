@@ -93,11 +93,11 @@ def load_split_data(conformation_file, val_proportion=0.1, test_proportion=0.1,
     # print('Warning, currently taking a random permutation for '
     #       'train/val/test partitions, this needs to be fixed for'
     #       'reproducibility.')
-    # assert not os.path.exists(os.path.join(base_path, 'Cu_w_XANES_permutation.npy'))
-    # np.save(os.path.join(base_path, 'Cu_w_XANES_permutation.npy'), perm)
+    # assert not os.path.exists(os.path.join(base_path, 'Ti_w_XANES_permutation.npy'))
+    # np.save(os.path.join(base_path, 'Ti_w_XANES_permutation.npy'), perm)
     # del perm
 
-    perm = np.load(os.path.join(base_path, 'Cu_w_XANES_permutation.npy'))
+    perm = np.load(os.path.join(base_path, 'Ti_w_XANES_permutation.npy'))
     data_list = [data_list[i] for i in perm]
 
     num_mol = len(data_list)
