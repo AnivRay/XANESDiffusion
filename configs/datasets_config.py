@@ -80,6 +80,32 @@ geom_with_h = {
     'atom_encoder': {'O': 0, 'Ti': 1},
     'atomic_nb': [6, 22],
     'atom_decoder': ['O', 'Ti'],
+    'max_n_nodes': 13,
+    'n_nodes': {9: 6, 7: 1618, 6: 98, 5: 89, 13: 2, 8: 16, 4: 2, 2: 4, 3: 11},
+    'atom_types':{0: 10770, 1: 1846},
+    'colors_dic': ['C3', 'C4'],
+    'radius_dic': [0.3, 0.6],
+    'with_h': True
+}
+
+ti_w_XANES_large = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Ti': 1},
+    'atomic_nb': [6, 22],
+    'atom_decoder': ['O', 'Ti'],
+    'max_n_nodes': 13,
+    'n_nodes': {9: 6, 7: 1618, 6: 98, 5: 89, 13: 2, 8: 16, 4: 2, 2: 4, 3: 11},
+    'atom_types':{0: 10770, 1: 1846},
+    'colors_dic': ['C3', 'C4'],
+    'radius_dic': [0.3, 0.6],
+    'with_h': True
+}
+
+ti_w_XANES = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Ti': 1},
+    'atomic_nb': [6, 22],
+    'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 7,
     'n_nodes': {5: 40, 6: 58, 7: 342},
     'atom_types':{0: 2502, 1: 440},
