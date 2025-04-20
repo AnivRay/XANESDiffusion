@@ -32,3 +32,4 @@ figures/
 geom_drugs.sh
 notebooks/*
 *.venv*
+depracated/

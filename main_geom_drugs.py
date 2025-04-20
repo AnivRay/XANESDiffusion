@@ -130,7 +130,7 @@ parser.add_argument('--sequential', action='store_true',
                     help='Organize data by size to reduce average memory usage.')
 args = parser.parse_args()
 
-data_file = './data/geom/Ti_w_XANES_large.npy' # './data/geom/geom_drugs_30.npy'
+data_file = './data/geom/XANES_dataset.npy' # './data/geom/geom_drugs_30.npy'
 
 if args.remove_h:
     raise NotImplementedError()

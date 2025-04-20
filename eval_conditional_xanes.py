@@ -207,6 +207,14 @@ def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, va
 
     return one_hot, charges, x
 
+def modify_for_num_nodes(values, nodesxsample, dataset_info):
+    n_nodes = list(dataset_info["n_nodes"].keys())
+    print("n_nodes:", n_nodes)
+    new_nodesxsample = torch.tensor(n_nodes).repeat(nodesxsample.size(0))
+    values['xanes'] = values['xanes'].repeat_interleave(len(n_nodes), dim=0)
+    print("GT Nodes:", nodesxsample[:20])
+    return values, new_nodesxsample
+
 
 def main_qualitative(args):
     args_gen = get_args_gen(args.generators_path)
@@ -220,6 +228,8 @@ def main_qualitative(args):
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
     values, nodesxsample = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
+    print("Test Set Num Nodes:", nodesxsample)
+    # values, nodesxsample = modify_for_num_nodes(values, nodesxsample, dataset_info)
     
     for i in range(args.n_sweeps):
         print("Sampling sweep %d/%d" % (i+1, args.n_sweeps))

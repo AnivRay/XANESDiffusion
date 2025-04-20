@@ -137,6 +137,19 @@ def sample(args, device, generative_model, dataset_info,
 
     if args.probabilistic_model == 'diffusion':
         x, h = generative_model.sample(batch_size, max_n_nodes, node_mask, edge_mask, context, fix_noise=fix_noise)
+        # nll = None
+        # for i in range(10000):
+        #     with torch.no_grad():
+        #         if nll is None:
+        #             nll = generative_model(x, h, node_mask, edge_mask.view(batch_size, max_n_nodes * max_n_nodes), context)
+        #         else:
+        #             nll += generative_model(x, h, node_mask, edge_mask.view(batch_size, max_n_nodes * max_n_nodes), context)
+        # nll = nll / 10000
+        # predictedNumNodes = torch.argmin(nll.reshape((-1, 9)), dim=1)
+        # print(nodesxsample.reshape(-1, 9))
+        # print(nll.reshape((-1, 9)))
+        # print("Predicted Nodes:", predictedNumNodes)
+        # exit(0)
 
         assert_correctly_masked(x, node_mask)
         assert_mean_zero_with_mask(x, node_mask)
