@@ -183,5 +183,5 @@ def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_
         context.append(values)
     context = torch.cat(context, dim=1).float().to(device)
 
-    one_hot, charges, x, node_mask = sample(args, device, generative_model, dataset_info, prop_dist, nodesxsample=nodesxsample, context=context, fix_noise=True)
+    one_hot, charges, x, node_mask = sample(args, device, generative_model, dataset_info, prop_dist, nodesxsample=nodesxsample, context=context, fix_noise=False)
     return one_hot, charges, x, node_mask

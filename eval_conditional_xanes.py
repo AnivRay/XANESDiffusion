@@ -197,7 +197,6 @@ def main_quantitative(args):
 
 def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, values, property_norms, nodesxsample, epoch=0, id_from=0):
     one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, values, property_norms, nodesxsample)
-
     vis.save_xyz_file(
         'outputs/%s/analysis/run%s/' % (args.exp_name, epoch), one_hot, charges, x, dataset_info,
         id_from, name='conditional', node_mask=node_mask)
@@ -215,8 +214,20 @@ def modify_for_num_nodes(values, nodesxsample, dataset_info):
     print("GT Nodes:", nodesxsample[:20])
     return values, new_nodesxsample
 
+def get_conditional_num_nodes(args):
+    metal = args.generators_path.split("/")[-1].split("_")[0].title()
+    nodesxsample_new = torch.from_numpy(np.load('outputs/CN_classifier/{}_CN_rf_model_pred.npy'.format(metal))) + 1
+    return nodesxsample_new
 
+def get_unconditional_num_nodes(nodes_dist, nodesxsample):
+    nodesxsample_new = nodes_dist.sample(nodesxsample.size(0))
+    return nodesxsample_new
+    
 def main_qualitative(args):
+    np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    torch.backends.cudnn.deterministic = True
     args_gen = get_args_gen(args.generators_path)
     args_gen.device = args.device
     dataloaders = get_dataloader(args_gen)
@@ -227,12 +238,23 @@ def main_qualitative(args):
     model, nodes_dist, prop_dist, dataset_info = get_generator(args.generators_path,
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
-    values, nodesxsample = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
-    print("Test Set Num Nodes:", nodesxsample)
+    values, nodesxsample_gt = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
+    # if args_gen.context_node_nf > 0: # conditional
+    #     nodesxsample = get_conditional_num_nodes(args)
+    # else: # unconditional
+    #     nodesxsample = get_unconditional_num_nodes(nodes_dist, nodesxsample_gt)
+    nodesxsample = nodesxsample_gt
+    # print(nodesxsample_gt)
+    # print(get_conditional_num_nodes(args))
+    # print(get_unconditional_num_nodes(nodes_dist, nodesxsample_gt))
+    # exit(0)
+
     # values, nodesxsample = modify_for_num_nodes(values, nodesxsample, dataset_info)
     
     for i in range(args.n_sweeps):
         print("Sampling sweep %d/%d" % (i+1, args.n_sweeps))
+        if args_gen.context_node_nf == 0: # unconditional
+            nodesxsample = get_unconditional_num_nodes(nodes_dist, nodesxsample_gt)
         save_and_sample_conditional(args_gen, device, model, prop_dist, dataset_info, values, property_norms, nodesxsample, epoch=i, id_from=0)
 
 
@@ -263,7 +285,6 @@ if __name__ == "__main__":
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if args.cuda else "cpu")
     args.device = device
-
     if args.task == 'qualitative':
         main_qualitative(args)
     else:
