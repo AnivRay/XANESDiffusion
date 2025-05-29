@@ -168,7 +168,6 @@ def sample(args, device, generative_model, dataset_info,
 
 
 def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_dist, property_values, property_norms, nodesxsample, n_nodes=7, n_frames=100):
-    # We no longer hardcode nodesxsample and instead provide it based on the ground truth # of nodes/atoms by molecule in the test set
     # nodesxsample = torch.tensor([n_nodes] * len(property_values['xanes']))
 
     context = []

@@ -191,7 +191,7 @@ if __name__ == "__main__":
     parser.add_argument('--exp_name', type=str, default='debug_xanes')
     parser.add_argument('--generators_path', type=str, default='outputs/ti_xanes_large_linear')
     parser.add_argument('--classifiers_path', type=str, default='qm9/property_prediction/outputs/exp_class_alpha_pretrained')
-    parser.add_argument('--property', type=str, default='xames',
+    parser.add_argument('--property', type=str, default='xanes',
                         help="'xanes', 'alpha', 'homo', 'lumo', 'gap', 'mu', 'Cv'")
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')

@@ -239,16 +239,14 @@ def main_qualitative(args):
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
     values, nodesxsample_gt = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
-    # if args_gen.context_node_nf > 0: # conditional
-    #     nodesxsample = get_conditional_num_nodes(args)
-    # else: # unconditional
-    #     nodesxsample = get_unconditional_num_nodes(nodes_dist, nodesxsample_gt)
-    nodesxsample = nodesxsample_gt
+    if args_gen.context_node_nf > 0: # conditional
+        nodesxsample = get_conditional_num_nodes(args)
+    else: # unconditional
+        nodesxsample = get_unconditional_num_nodes(nodes_dist, nodesxsample_gt)
+    # nodesxsample = nodesxsample_gt
     # print(nodesxsample_gt)
     # print(get_conditional_num_nodes(args))
     # print(get_unconditional_num_nodes(nodes_dist, nodesxsample_gt))
-    # exit(0)
-
     # values, nodesxsample = modify_for_num_nodes(values, nodesxsample, dataset_info)
     
     for i in range(args.n_sweeps):
