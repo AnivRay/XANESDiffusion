@@ -107,7 +107,7 @@ def get_args_gen(dir_path):
 
 def get_generator(device, args_gen):
     dataset_info = get_dataset_info(args_gen.dataset, args_gen.remove_h)
-    model = kNN(k=3)
+    model = kNN(k=10)
     return model, dataset_info
 
 

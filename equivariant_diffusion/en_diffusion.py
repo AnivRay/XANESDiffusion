@@ -112,7 +112,6 @@ def gaussian_KL_for_dimension(q_mu, q_sigma, p_mu, p_sigma, d):
             The KL distance, summed over all dimensions except the batch dim.
         """
     mu_norm2 = sum_except_batch((q_mu - p_mu)**2)
-    # print(len(q_sigma.size()))
     assert len(q_sigma.size()) == 1
     assert len(p_sigma.size()) == 1
     return (d * torch.log(p_sigma / (q_sigma + 1e-8) + 1e-8) 
@@ -422,9 +421,8 @@ class EnVariationalDiffusion(torch.nn.Module):
         mu_T_x, mu_T_h = mu_T[:, :, :self.n_dims], mu_T[:, :, self.n_dims:]
 
         # Compute standard deviations (only batch axis for x-part, inflated for h-part).
-        sigma_T_x = self.sigma(gamma_T, mu_T_x).squeeze()  # Remove inflate, only keep batch dimension for x-part.
+        sigma_T_x = self.sigma(gamma_T, mu_T_x).reshape(-1)  # Remove inflate, only keep batch dimension for x-part.
         sigma_T_h = self.sigma(gamma_T, mu_T_h)
-        # print(sigma_T_x.size(), " ", sigma_T_h.size())
 
         # Compute KL for h-part.
         zeros, ones = torch.zeros_like(mu_T_h), torch.ones_like(sigma_T_h)
@@ -763,15 +761,18 @@ class EnVariationalDiffusion(torch.nn.Module):
         return z
 
     @torch.no_grad()
-    def sample(self, n_samples, n_nodes, node_mask, edge_mask, context, fix_noise=False):
+    def sample(self, n_samples, n_nodes, node_mask, edge_mask, context, fix_noise=False, init_z=None):
         """
         Draw samples from the generative model.
         """
-        if fix_noise:
-            # Noise is broadcasted over the batch axis, useful for visualizations.
-            z = self.sample_combined_position_feature_noise(1, n_nodes, node_mask)
+        if init_z is not None:
+            z = init_z
         else:
-            z = self.sample_combined_position_feature_noise(n_samples, n_nodes, node_mask)
+            if fix_noise:
+                # Noise is broadcasted over the batch axis, useful for visualizations.
+                z = self.sample_combined_position_feature_noise(1, n_nodes, node_mask)
+            else:
+                z = self.sample_combined_position_feature_noise(n_samples, n_nodes, node_mask)
 
         diffusion_utils.assert_mean_zero_with_mask(z[:, :, :self.n_dims], node_mask)
 
@@ -1209,12 +1210,28 @@ class EnLatentDiffusion(EnVariationalDiffusion):
         return neg_log_pxh
     
     @torch.no_grad()
-    def sample(self, n_samples, n_nodes, node_mask, edge_mask, context, fix_noise=False):
+    def sample(self, n_samples, n_nodes, node_mask, edge_mask, context, fix_noise=False, init=None):
         """
         Draw samples from the generative model.
         """
-        z_x, z_h = super().sample(n_samples, n_nodes, node_mask, edge_mask, context, fix_noise)
+        if init:
+            x, h = init
+            x = diffusion_utils.remove_mean_with_mask(x, node_mask)
+            # Encode data to latent space.
+            z_x_mu, z_x_sigma, z_h_mu, z_h_sigma = self.vae.encode(x, h, node_mask, edge_mask, context)
+            # Compute fixed sigma values.
+            t_zeros = torch.zeros(size=(x.size(0), 1), device=x.device)
+            gamma_0 = self.inflate_batch_array(self.gamma(t_zeros), x)
+            sigma_0 = self.sigma(gamma_0, x)
 
+            # Infer latent z.
+            z_xh_mean = torch.cat([z_x_mu, z_h_mu], dim=2)
+            diffusion_utils.assert_correctly_masked(z_xh_mean, node_mask)
+            z_xh_sigma = sigma_0
+            z_xh = self.vae.sample_normal(z_xh_mean, z_xh_sigma, node_mask)
+            init = z_xh
+        
+        z_x, z_h = super().sample(n_samples, n_nodes, node_mask, edge_mask, context, fix_noise, init_z=init)
         z_xh = torch.cat([z_x, z_h['categorical'], z_h['integer']], dim=2)
         diffusion_utils.assert_correctly_masked(z_xh, node_mask)
         x, h = self.vae.decode(z_xh, node_mask, edge_mask, context)

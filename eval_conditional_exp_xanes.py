@@ -13,6 +13,12 @@ from qm9.property_prediction import main_qm9_prop
 from xanes.sampling import sample_chain, sample, sample_sweep_conditional
 import qm9.visualizer as vis
 
+def get_exp_values():
+    expXanes = np.load("data/exp/Fe_all_morphed_xanes_interp.npy")
+    values = {'xanes': torch.tensor(expXanes)}
+    nodesxsample = torch.tensor([7, 5, 5, 5, 5]).int()
+    return values, nodesxsample
+
 def get_and_save_values_from_dataloader(args, dataloader, properties, dataset_info):
     values = {}
     nodesxsample = []
@@ -198,7 +204,7 @@ def main_quantitative(args):
 def save_and_sample_conditional(args, device, model, prop_dist, dataset_info, values, property_norms, nodesxsample, epoch=0, id_from=0):
     one_hot, charges, x, node_mask = sample_sweep_conditional(args, device, model, dataset_info, prop_dist, values, property_norms, nodesxsample)
     vis.save_xyz_file(
-        'outputs/%s/analysis/run%s/' % (args.exp_name, epoch), one_hot, charges, x, dataset_info,
+        'outputs/%s/analysis_exp/run%s/' % (args.exp_name, epoch), one_hot, charges, x, dataset_info,
         id_from, name='conditional', node_mask=node_mask)
 
     # vis.visualize_chain("outputs/%s/analysis/run%s/" % (args.exp_name, epoch), dataset_info,
@@ -238,7 +244,7 @@ def main_qualitative(args):
     model, nodes_dist, prop_dist, dataset_info = get_generator(args.generators_path,
                                                                dataloaders, args.device, args_gen,
                                                                property_norms)
-    values, nodesxsample_gt = get_and_save_values_from_dataloader(args_gen, dataloaders["test"], args_gen.conditioning, dataset_info)
+    values, nodesxsample_gt = get_exp_values()
     # if args_gen.context_node_nf > 0: # conditional
     #     nodesxsample = get_conditional_num_nodes(args)
     # else: # unconditional

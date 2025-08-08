@@ -77,21 +77,8 @@ qm9_second_half = {
 # {"V":23, "Cr":24, "Mn":25, "Fe":26, "Co":27, "Ni":28, "Cu":29}
 geom_with_h = {
     'name': 'XANES',
-    'atom_encoder': {'O': 0, 'Fe': 1},
-    'atomic_nb': [6, 26],
-    'atom_decoder': ['O', 'Fe'],
-    'max_n_nodes': 7,
-    'n_nodes': {7: 773, 6: 550, 5: 234},
-    'atom_types':{0: 8324, 1: 1557},
-    'colors_dic': ['C3', 'C4'],
-    'radius_dic': [0.3, 0.6],
-    'with_h': True
-}
-
-fe_w_XANES_large = {
-    'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1},
-    'atomic_nb': [6, 22],
+    'atomic_nb': [8, 22],
     'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 13,
     'n_nodes': {9: 6, 7: 1618, 6: 98, 5: 89, 13: 2, 8: 16, 4: 2, 2: 4, 3: 11},
@@ -101,10 +88,62 @@ fe_w_XANES_large = {
     'with_h': True
 }
 
+mn_w_XANES_large = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Mn': 1},
+    'atomic_nb': [8, 25],
+    'atom_decoder': ['O', 'Mn'],
+    'max_n_nodes': 9,
+    'n_nodes': {7: 877, 6: 664, 9: 5, 5: 84, 2: 1, 8: 3, 4: 2},
+    'atom_types':{0: 8986, 1: 1636},
+    'colors_dic': ['C3', 'C4'],
+    'radius_dic': [0.3, 0.6],
+    'with_h': True
+}
+
+all_w_xanes_large = {
+    'name': 'XANES',
+    'atom_encoder': {'H': 0, 'Li': 1, 'C': 2, 'N': 3, 'O': 4, 'F': 5, 'Na': 6, 'P': 7, 'S': 8, 'Cl': 9, 'K': 10, 'Ti': 11, 'V': 12, 'Cr': 13, 'Mn': 14, 'Fe': 15, 'Co': 16, 'Ni': 17, 'Cu': 18, 'As': 19, 'Se': 20, 'Br': 21, 'Rb': 22, 'Sb': 23, 'Te': 24, 'I': 25, 'Ba': 26},
+    'atomic_nb': [1, 3, 6, 7, 8, 9, 11, 15, 16, 17, 19, 22, 23, 24, 25, 26, 27, 28, 29, 33, 34, 35, 37, 51, 52, 53, 56],
+    'atom_decoder': ['H', 'Li', 'C', 'N', 'O', 'F', 'Na', 'P', 'S', 'Cl', 'K', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'As', 'Se', 'Br', 'Rb', 'Sb', 'Te', 'I', 'Ba'],
+    'max_n_nodes': 13,
+    'n_nodes': {7: 8169, 6: 1800, 5: 1879, 9: 28, 4: 74, 8: 51, 11: 4, 3: 119, 12: 1, 2: 8, 13: 3},
+    'atom_types':{16: 804, 4: 58029, 2: 457, 3: 1227, 9: 143, 8: 196, 21: 60, 5: 6409, 13: 455, 18: 1499, 19: 24, 22: 6, 6: 6, 1: 6, 10: 6, 7: 12, 20: 30, 24: 12, 26: 2, 15: 2134, 0: 6, 14: 2391, 23: 16, 25: 4, 17: 617, 11: 2383, 12: 1868},
+    'colors_dic': ['C3'] + ['C4']*26,
+    'radius_dic': [0.3] + [0.6]*26,
+    'with_h': True
+}
+
+fe_w_2nd_shell = {
+    'name': 'XANES',
+    'atom_encoder': {'H': 0, 'Li': 1, 'B': 2, 'C': 3, 'N': 4, 'O': 5, 'F': 6, 'Na': 7, 'Mg': 8, 'Al': 9, 'Si': 10, 'P': 11, 'S': 12, 'Cl': 13, 'K': 14, 'Ca': 15, 'Sc': 16, 'Ti': 17, 'V': 18, 'Cr': 19, 'Mn': 20, 'Fe': 21, 'Co': 22, 'Ni': 23, 'Cu': 24, 'Zn': 25, 'Ga': 26, 'Ge': 27, 'As': 28, 'Se': 29, 'Rb': 30, 'Sr': 31, 'Y': 32, 'Zr': 33, 'Nb': 34, 'Mo': 35, 'Rh': 36, 'Sn': 37, 'Sb': 38, 'Te': 39, 'Cs': 40, 'Ba': 41, 'La': 42, 'Ce': 43, 'Nd': 44, 'Sm': 45, 'Eu': 46, 'Gd': 47, 'Tb': 48, 'Dy': 49, 'Ho': 50, 'Tm': 51, 'Ta': 52, 'W': 53, 'Re': 54, 'Au': 55, 'Pb': 56, 'Bi': 57},
+    'atomic_nb': [1, 3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 45, 50, 51, 52, 55, 56, 57, 58, 60, 62, 63, 64, 65, 66, 67, 69, 73, 74, 75, 79, 82, 83],
+    'atom_decoder': ['H', 'Li', 'B', 'C', 'N', 'O', 'F', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Rh', 'Sn', 'Sb', 'Te', 'Cs', 'Ba', 'La', 'Ce', 'Nd', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Tm', 'Ta', 'W', 'Re', 'Au', 'Pb', 'Bi'],
+    'max_n_nodes': 31,
+    'n_nodes': {21: 70, 19: 264, 17: 720, 12: 25, 16: 202, 18: 99, 25: 78, 9: 33, 24: 6, 15: 202, 22: 32, 20: 40, 14: 146, 13: 125, 11: 20, 23: 39, 8: 1, 7: 5, 5: 1, 10: 8, 31: 1, 27: 8, 26: 6, 28: 2},
+    'atom_types':{'Fe': 12800, 'O': 10154, 'Ca': 131, 'Ge': 69, 'Li': 4280, 'Na': 519, 'P': 1000, 'La': 19, 'Si': 396, 'Mg': 206, 'K': 59, 'Mn': 301, 'Mo': 69, 'Rh': 2, 'W': 52, 'Ba': 150, 'Sr': 148, 'As': 34, 'B': 2497, 'Nd': 18, 'V': 124, 'C': 202, 'Tb': 12, 'S': 93, 'Ti': 241, 'Zn': 110, 'Cs': 1, 'Tm': 2, 'Dy': 10, 'H': 211, 'Ta': 22, 'Re': 30, 'Cu': 125, 'Rb': 51, 'Co': 127, 'Al': 142, 'Cr': 39, 'Ni': 121, 'Nb': 19, 'Sm': 12, 'Te': 44, 'Y': 12, 'Sb': 34, 'Eu': 17, 'Ce': 12, 'Cl': 10, 'N': 4, 'Sn': 41, 'F': 1452, 'Se': 6, 'Pb': 4, 'Gd': 2, 'Zr': 3, 'Ga': 66, 'Bi': 7, 'Sc': 8, 'Ho': 12, 'Au': 6},
+    'colors_dic': ['C3'] + ['C4']*57,
+    'radius_dic': [0.3] + [0.6]*57,
+    'with_h': True
+}
+
+fe_w_XANES_large = {
+    'name': 'XANES',
+    'atom_encoder': {'O': 0, 'Fe': 1},
+    'atomic_nb': [8, 26],
+    'atom_decoder': ['O', 'Fe'],
+    'max_n_nodes': 7,
+    'n_nodes': {7: 773, 6: 550, 5: 234},
+    'atom_types':{0: 8324, 1: 1557},
+    'colors_dic': ['C3', 'C4'],
+    'radius_dic': [0.3, 0.6],
+    'with_h': True
+}
+
 ti_w_XANES_large = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1},
-    'atomic_nb': [6, 22],
+    'atomic_nb': [8, 22],
     'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 13,
     'n_nodes': {9: 6, 7: 1618, 6: 98, 5: 89, 13: 2, 8: 16, 4: 2, 2: 4, 3: 11},
@@ -117,7 +156,7 @@ ti_w_XANES_large = {
 ti_w_XANES = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1},
-    'atomic_nb': [6, 22],
+    'atomic_nb': [8, 22],
     'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 7,
     'n_nodes': {5: 40, 6: 58, 7: 342},
@@ -130,7 +169,7 @@ ti_w_XANES = {
 cu_w_XANES = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Cu': 1},
-    'atomic_nb': [6, 29],
+    'atomic_nb': [8, 29],
     'atom_decoder': ['O', 'Cu'],
     'max_n_nodes': 7,
     'n_nodes': {5: 314, 6: 106, 7: 153},
@@ -143,7 +182,7 @@ cu_w_XANES = {
 all_w_XANES = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1, 'V': 2, 'Cr': 3, 'Mn': 4, 'Fe': 5, 'Co': 6, 'Ni': 7, 'Cu': 8},
-    'atomic_nb': [6, 22, 23, 24, 25, 26, 27, 28, 29],
+    'atomic_nb': [8, 22, 23, 24, 25, 26, 27, 28, 29],
     'atom_decoder': ['O', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu'],
     'max_n_nodes': 7,
     'n_nodes': {5: 646, 6: 354, 7: 1636},
@@ -156,7 +195,7 @@ all_w_XANES = {
 old_XANES = {
     'name': 'XANES',
     'atom_encoder': {'O': 0, 'Ti': 1},
-    'atomic_nb': [6, 22],
+    'atomic_nb': [8, 22],
     'atom_decoder': ['O', 'Ti'],
     'max_n_nodes': 7,
     'n_nodes': {7: 342},

@@ -109,7 +109,7 @@ def sample_chain(args, device, flow, n_tries, dataset_info, prop_dist=None):
 
 def sample(args, device, generative_model, dataset_info,
            prop_dist=None, nodesxsample=torch.tensor([10]), context=None,
-           fix_noise=False):
+           fix_noise=False, init=None):
     max_n_nodes = dataset_info['max_n_nodes']  # this is the maximum node_size in QM9
 
     assert int(torch.max(nodesxsample)) <= max_n_nodes
@@ -136,7 +136,7 @@ def sample(args, device, generative_model, dataset_info,
         context = None
 
     if args.probabilistic_model == 'diffusion':
-        x, h = generative_model.sample(batch_size, max_n_nodes, node_mask, edge_mask, context, fix_noise=fix_noise)
+        x, h = generative_model.sample(batch_size, max_n_nodes, node_mask, edge_mask, context, fix_noise=fix_noise, init=init)
         # nll = None
         # for i in range(10000):
         #     with torch.no_grad():
@@ -167,7 +167,7 @@ def sample(args, device, generative_model, dataset_info,
     return one_hot, charges, x, node_mask
 
 
-def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_dist, property_values, property_norms, nodesxsample, n_nodes=7, n_frames=100):
+def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_dist, property_values, property_norms, nodesxsample, n_nodes=7, n_frames=100, init=None):
     # nodesxsample = torch.tensor([n_nodes] * len(property_values['xanes']))
 
     context = []
@@ -182,5 +182,5 @@ def sample_sweep_conditional(args, device, generative_model, dataset_info, prop_
         context.append(values)
     context = torch.cat(context, dim=1).float().to(device)
 
-    one_hot, charges, x, node_mask = sample(args, device, generative_model, dataset_info, prop_dist, nodesxsample=nodesxsample, context=context, fix_noise=False)
+    one_hot, charges, x, node_mask = sample(args, device, generative_model, dataset_info, prop_dist, nodesxsample=nodesxsample, context=context, fix_noise=False, init=init)
     return one_hot, charges, x, node_mask
